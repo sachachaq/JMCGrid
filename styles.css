@@ -328,6 +328,31 @@ body {
 .manager-dot:hover .dot-tooltip,
 .manager-dot.show-tooltip .dot-tooltip { display: block; }
 
+.dot-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.dot-btn {
+  flex: 1;
+  padding: 5px 0;
+  border: none;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dot-btn-move {
+  background: #4338ca;
+  color: #fff;
+}
+.dot-btn-move:hover { background: #3730a3; }
+.dot-btn-delete {
+  background: #ef4444;
+  color: #fff;
+}
+.dot-btn-delete:hover { background: #dc2626; }
+
 /* ── Modal ── */
 .modal-overlay {
   position: fixed;

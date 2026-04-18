@@ -60,7 +60,13 @@ const db = (() => {
     console.log('[db] Updated placement:', id);
   }
 
-  return { init, loadAll, insert, update };
+  async function remove(id) {
+    const { error } = await client.from('placements').delete().eq('id', id);
+    if (error) { console.error('[db] delete failed:', error.message); return; }
+    console.log('[db] Deleted placement:', id);
+  }
+
+  return { init, loadAll, insert, update, remove };
 })();
 
 // ── State ──
@@ -400,6 +406,10 @@ function renderGrid(supervisor, gridType) {
         <strong>${m.fullName}</strong><br>
         Store #${m.storeNumber}<br>
         <span style="opacity:0.7">${supervisor} &middot; ${gridType}</span>
+        <div class="dot-actions">
+          <button class="dot-btn dot-btn-move" data-action="move" data-id="${m.id}">Move</button>
+          <button class="dot-btn dot-btn-delete" data-action="delete" data-id="${m.id}">Delete</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -526,26 +536,40 @@ function bindGrid(supervisor, gridType) {
     });
   }
 
-  // Dot clicks
+  // Dot clicks — show tooltip, handle Move/Delete buttons
   const dotLayer = document.getElementById('dotLayer');
   if (dotLayer) {
     dotLayer.addEventListener('click', (e) => {
-      const dot = e.target.closest('.manager-dot');
-      if (!dot) return;
-      e.stopPropagation();
-
-      if (state.pending) return;
-
-      const id = dot.dataset.id;
-
-      if (!dot.classList.contains('show-tooltip') && state.moving !== id) {
-        dotLayer.querySelectorAll('.manager-dot.show-tooltip').forEach(d => d.classList.remove('show-tooltip'));
-        dot.classList.add('show-tooltip');
+      // Handle Move button
+      const moveBtn = e.target.closest('[data-action="move"]');
+      if (moveBtn) {
+        e.stopPropagation();
+        state.moving = moveBtn.dataset.id;
+        render();
         return;
       }
 
-      state.moving = state.moving === id ? null : id;
-      render();
+      // Handle Delete button
+      const deleteBtn = e.target.closest('[data-action="delete"]');
+      if (deleteBtn) {
+        e.stopPropagation();
+        const id = deleteBtn.dataset.id;
+        state.placements = state.placements.filter(p => p.id !== id);
+        db.remove(id);
+        render();
+        return;
+      }
+
+      // Click on dot itself — toggle tooltip
+      const dot = e.target.closest('.manager-dot');
+      if (!dot) return;
+      e.stopPropagation();
+      if (state.pending || state.moving) return;
+
+      dotLayer.querySelectorAll('.manager-dot.show-tooltip').forEach(d => {
+        if (d !== dot) d.classList.remove('show-tooltip');
+      });
+      dot.classList.toggle('show-tooltip');
     });
 
     document.addEventListener('click', (e) => {
@@ -555,11 +579,12 @@ function bindGrid(supervisor, gridType) {
     });
   }
 
-  // Matrix click
+  // Matrix click — place new or move existing
   const matrix = document.getElementById('matrixContainer');
-  if (matrix && (state.pending || state.moving)) {
+  if (matrix) {
     matrix.addEventListener('click', (e) => {
       if (e.target.closest('.manager-dot')) return;
+      if (!state.pending && !state.moving) return;
 
       const rect = matrix.getBoundingClientRect();
       const xPercent = Math.round(((e.clientX - rect.left) / rect.width) * 10000) / 100;
@@ -580,7 +605,6 @@ function bindGrid(supervisor, gridType) {
         state.pending = null;
         render();
 
-        // Persist and swap in the real UUID
         db.insert(newPlacement).then(saved => {
           if (saved) {
             const idx = state.placements.findIndex(p => p.id === tempId);
