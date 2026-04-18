@@ -106,6 +106,51 @@ function roleBadgeColor(role) {
   }
 }
 
+// ── Read-only Matrix ──
+function renderReadOnlyMatrix(managers) {
+  const dots = managers.map(m => {
+    const role = roleFromGridType(m.gridType);
+    return `
+    <div class="manager-dot" style="left:${m.xPercent}%;top:${m.yPercent}%">
+      <div class="dot-circle" style="border-color:${roleBadgeColor(role)}">${m.storeNumber}</div>
+      <div class="dot-tooltip">
+        <strong>${m.fullName}</strong><br>
+        Store #${m.storeNumber}<br>
+        <span style="opacity:0.7">${m.supervisorName} &middot; ${m.gridType}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const cellLabels = [
+    'High Potential\nLow Performance',  'High Potential\nMed Performance',  'High Potential\nHigh Performance',
+    'Med Potential\nLow Performance',   'Med Potential\nMed Performance',   'Med Potential\nHigh Performance',
+    'Low Potential\nLow Performance',   'Low Potential\nMed Performance',   'Low Potential\nHigh Performance'
+  ];
+
+  const cells = cellLabels.map((label, i) =>
+    `<div class="matrix-cell" data-cell="${i}">
+      <span class="cell-label">${label.replace('\n', '<br>')}</span>
+    </div>`
+  ).join('');
+
+  return `
+    <div class="matrix-wrapper">
+      <div class="y-axis">
+        <span class="y-axis-label"><span class="y-axis-arrow">&#8593;</span> Potential</span>
+      </div>
+      <div class="matrix-col">
+        <div class="matrix-container">
+          ${cells}
+          <div class="dot-layer">${dots}</div>
+        </div>
+        <div class="x-axis">
+          <span class="x-axis-label">Performance</span>
+          <span class="x-axis-arrow">&#8594;</span>
+        </div>
+      </div>
+    </div>`;
+}
+
 // ── Router ──
 function getRoute() {
   return location.hash.slice(1) || '/';
@@ -254,6 +299,7 @@ function renderTeam(supervisor) {
     <a class="back-link" href="#/supervisor/${encodeURIComponent(supervisor)}">&#8592; ${supervisor}</a>
     <h1 class="page-title">Team ${supervisor}</h1>
     <p class="page-subtitle">${managers.length} manager${managers.length !== 1 ? 's' : ''} across all grids</p>
+    ${renderReadOnlyMatrix(managers)}
     ${content}`;
 }
 
@@ -335,6 +381,7 @@ function renderJmcRoster(filter) {
     <a class="back-link" href="#/jmc">&#8592; JMC</a>
     <h1 class="page-title">${title}</h1>
     <p class="page-subtitle">${managers.length} manager${managers.length !== 1 ? 's' : ''}</p>
+    ${renderReadOnlyMatrix(managers)}
     ${content}`;
 }
 
@@ -555,6 +602,22 @@ function bindGrid(supervisor, gridType) {
     });
   }
 }
+
+// ── Global tooltip handler for read-only matrices ──
+document.addEventListener('click', (e) => {
+  const dot = e.target.closest('.manager-dot');
+  if (dot) {
+    const layer = dot.closest('.dot-layer');
+    if (layer) {
+      layer.querySelectorAll('.manager-dot.show-tooltip').forEach(d => {
+        if (d !== dot) d.classList.remove('show-tooltip');
+      });
+    }
+    dot.classList.toggle('show-tooltip');
+  } else {
+    document.querySelectorAll('.manager-dot.show-tooltip').forEach(d => d.classList.remove('show-tooltip'));
+  }
+});
 
 // ── Init ──
 window.addEventListener('hashchange', async () => {
