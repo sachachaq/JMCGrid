@@ -60,13 +60,19 @@ const db = (() => {
     console.log('[db] Updated placement:', id);
   }
 
+  async function updateName(id, fullName) {
+    const { error } = await client.from('placements').update({ full_name: fullName }).eq('id', id);
+    if (error) { console.error('[db] updateName failed:', error.message); return; }
+    console.log('[db] Updated name:', id, fullName);
+  }
+
   async function remove(id) {
     const { error } = await client.from('placements').delete().eq('id', id);
     if (error) { console.error('[db] delete failed:', error.message); return; }
     console.log('[db] Deleted placement:', id);
   }
 
-  return { init, loadAll, insert, update, remove };
+  return { init, loadAll, insert, update, updateName, remove };
 })();
 
 // ── State ──
@@ -406,10 +412,11 @@ function renderGrid(supervisor, gridType) {
         <strong>${m.fullName}</strong><br>
         Store #${m.storeNumber}<br>
         <span style="opacity:0.7">${supervisor} &middot; ${gridType}</span>
-        <div class="dot-actions">
-          <button class="dot-btn dot-btn-move" data-action="move" data-id="${m.id}">Move</button>
-          <button class="dot-btn dot-btn-delete" data-action="delete" data-id="${m.id}">Delete</button>
-        </div>
+      </div>
+      <div class="dot-actions-popup" style="display:none">
+        <button class="dot-btn dot-btn-move" data-action="move" data-id="${m.id}">Move</button>
+        <button class="dot-btn dot-btn-edit" data-action="edit" data-id="${m.id}">Edit</button>
+        <button class="dot-btn dot-btn-delete" data-action="delete" data-id="${m.id}">Delete</button>
       </div>
     </div>`;
   }).join('');
@@ -536,7 +543,7 @@ function bindGrid(supervisor, gridType) {
     });
   }
 
-  // Dot clicks — show tooltip, handle Move/Delete buttons
+  // Dot clicks — show action popup, handle Move/Edit/Delete
   const dotLayer = document.getElementById('dotLayer');
   if (dotLayer) {
     dotLayer.addEventListener('click', (e) => {
@@ -544,8 +551,25 @@ function bindGrid(supervisor, gridType) {
       const moveBtn = e.target.closest('[data-action="move"]');
       if (moveBtn) {
         e.stopPropagation();
+        dotLayer.querySelectorAll('.dot-actions-popup').forEach(p => p.style.display = 'none');
         state.moving = moveBtn.dataset.id;
         render();
+        return;
+      }
+
+      // Handle Edit button
+      const editBtn = e.target.closest('[data-action="edit"]');
+      if (editBtn) {
+        e.stopPropagation();
+        const id = editBtn.dataset.id;
+        const mgr = state.placements.find(p => p.id === id);
+        if (!mgr) return;
+        const newName = prompt('Edit manager name:', mgr.fullName);
+        if (newName && newName.trim() && newName.trim() !== mgr.fullName) {
+          mgr.fullName = newName.trim();
+          db.updateName(id, newName.trim());
+          render();
+        }
         return;
       }
 
@@ -560,21 +584,26 @@ function bindGrid(supervisor, gridType) {
         return;
       }
 
-      // Click on dot itself — toggle tooltip
+      // Click on dot itself — toggle action popup
       const dot = e.target.closest('.manager-dot');
       if (!dot) return;
       e.stopPropagation();
       if (state.pending || state.moving) return;
 
-      dotLayer.querySelectorAll('.manager-dot.show-tooltip').forEach(d => {
-        if (d !== dot) d.classList.remove('show-tooltip');
-      });
-      dot.classList.toggle('show-tooltip');
+      const popup = dot.querySelector('.dot-actions-popup');
+      const isVisible = popup.style.display === 'flex';
+
+      // Hide all popups first
+      dotLayer.querySelectorAll('.dot-actions-popup').forEach(p => p.style.display = 'none');
+
+      if (!isVisible) {
+        popup.style.display = 'flex';
+      }
     });
 
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.manager-dot')) {
-        dotLayer.querySelectorAll('.manager-dot.show-tooltip').forEach(d => d.classList.remove('show-tooltip'));
+        dotLayer.querySelectorAll('.dot-actions-popup').forEach(p => p.style.display = 'none');
       }
     });
   }
