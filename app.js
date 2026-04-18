@@ -603,8 +603,11 @@ function bindGrid(supervisor, gridType) {
   }
 }
 
-// ── Global tooltip handler for read-only matrices ──
+// ── Global tooltip handler for read-only matrices only ──
 document.addEventListener('click', (e) => {
+  // Skip dots inside the interactive grid — bindGrid handles those
+  if (e.target.closest('#matrixContainer')) return;
+
   const dot = e.target.closest('.manager-dot');
   if (dot) {
     const layer = dot.closest('.dot-layer');
