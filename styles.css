@@ -315,6 +315,10 @@ body {
   line-height: 1.5;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   z-index: 10;
+  min-width: 140px;
+}
+.dot-actions {
+  white-space: normal;
 }
 .dot-tooltip::after {
   content: '';
