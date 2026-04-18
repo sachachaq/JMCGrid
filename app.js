@@ -624,12 +624,12 @@ window.addEventListener('hashchange', async () => {
   state.pending = null;
   state.moving = null;
   state.modalOpen = false;
-  await db.loadAll();
+  try { await db.loadAll(); } catch (e) { console.error('[db] reload failed:', e); }
   render();
 });
 
 (async () => {
   db.init();
-  await db.loadAll();
+  try { await db.loadAll(); } catch (e) { console.error('[db] init load failed:', e); }
   render();
 })();
