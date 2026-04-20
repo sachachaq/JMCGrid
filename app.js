@@ -470,6 +470,33 @@ function renderGrid(supervisor, gridType) {
       </div>
     </div>` : '';
 
+  // Build roster below grid
+  const allSupManagers = state.placements.filter(p => p.supervisorName === supervisor);
+  const grouped = { GM: [], AM: [], SM: [] };
+  allSupManagers.forEach(m => {
+    const role = roleFromGridType(m.gridType);
+    if (grouped[role]) grouped[role].push(m);
+  });
+
+  let roster = '';
+  for (const [role, list] of Object.entries(grouped)) {
+    if (list.length === 0) continue;
+    roster += `
+      <div class="roster-group">
+        <div class="roster-group-title">
+          <span class="role-badge" style="background:${roleBadgeColor(role)}">${role}</span>
+          ${list.length} manager${list.length !== 1 ? 's' : ''}
+        </div>
+        <div class="roster-list">
+          ${list.map(m => `
+            <div class="roster-item">
+              <div class="roster-name">${m.fullName}</div>
+              <div class="roster-meta">Store #${m.storeNumber}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
   return `
     <a class="back-link" href="#/supervisor/${encodeURIComponent(supervisor)}">&#8592; ${supervisor}</a>
     <div class="grid-header">
@@ -492,6 +519,7 @@ function renderGrid(supervisor, gridType) {
         </div>
       </div>
     </div>
+    ${roster}
     ${modal}`;
 }
 
