@@ -228,10 +228,13 @@ function renderHome() {
 
   const supCards = state.supervisors.map(name => {
     const count = state.placements.filter(p => p.supervisorName === name).length;
+    const stores = state.storeNumbers[name] || [];
+    const storeText = stores.length ? stores.join(', ') : 'No stores';
     return `
       <div class="card" onclick="navigate('/supervisor/${encodeURIComponent(name)}')">
         <div class="card-label">${name}</div>
         <div class="card-sub">${count} manager${count !== 1 ? 's' : ''} placed</div>
+        <div class="card-stores">Stores: ${storeText}</div>
       </div>`;
   }).join('');
 

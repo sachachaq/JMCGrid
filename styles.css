@@ -70,6 +70,12 @@ body {
   color: #9ca3af;
   margin-top: 6px;
 }
+.card-stores {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 8px;
+  line-height: 1.4;
+}
 
 .card-jmc {
   border-color: #c7d2fe;
