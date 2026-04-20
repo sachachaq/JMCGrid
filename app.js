@@ -124,7 +124,7 @@ function renderReadOnlyMatrix(managers) {
     const role = roleFromGridType(m.gridType);
     return `
     <div class="manager-dot" style="left:${m.xPercent}%;top:${m.yPercent}%">
-      <div class="dot-circle" style="border-color:${roleBadgeColor(role)}">${m.storeNumber}</div>
+      <div class="dot-circle" style="border-color:${roleBadgeColor(role)}">${m.fullName}</div>
       <div class="dot-tooltip">
         <strong>${m.fullName}</strong><br>
         Store #${m.storeNumber}<br>
@@ -407,7 +407,7 @@ function renderGrid(supervisor, gridType) {
     const isMoving = state.moving === m.id;
     return `
     <div class="manager-dot${isMoving ? ' moving' : ''}" style="left:${m.xPercent}%;top:${m.yPercent}%" data-id="${m.id}">
-      <div class="dot-circle">${m.storeNumber}</div>
+      <div class="dot-circle">${m.fullName}</div>
       <div class="dot-tooltip">
         <strong>${m.fullName}</strong><br>
         Store #${m.storeNumber}<br>

@@ -251,7 +251,7 @@ body {
 
 .cell-label {
   font-size: 10px;
-  color: #c4c9d4;
+  color: #1e3a5f;
   font-weight: 500;
   line-height: 1.2;
   pointer-events: none;
@@ -273,18 +273,18 @@ body {
   z-index: 2;
 }
 .dot-circle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  padding: 4px 8px;
+  border-radius: 12px;
   background: #4338ca;
   color: #fff;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 4px rgba(67,56,202,0.3);
   transition: transform 0.12s;
+  white-space: nowrap;
 }
 .manager-dot:hover .dot-circle {
   transform: scale(1.15);
@@ -502,9 +502,8 @@ body {
   }
 
   .dot-circle {
-    width: 26px;
-    height: 26px;
-    font-size: 8px;
+    padding: 3px 6px;
+    font-size: 7px;
   }
 
   .dot-tooltip {
