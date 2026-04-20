@@ -113,7 +113,7 @@ function roleBadgeColor(role) {
   switch (role) {
     case 'GM': return '#4c1d95';
     case 'AM': return '#7c3aed';
-    case 'SM': return '#a78bfa';
+    case 'SM': return '#c4b5fd';
     default:   return '#6b7280';
   }
 }
