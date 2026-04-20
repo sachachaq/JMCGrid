@@ -587,7 +587,7 @@ function bindGrid(supervisor, gridType) {
       const moveBtn = e.target.closest('[data-action="move"]');
       if (moveBtn) {
         e.stopPropagation();
-        dotLayer.querySelectorAll('.dot-actions-popup').forEach(p => p.style.display = 'none');
+        document.querySelector('.info-modal-overlay')?.remove();
         state.moving = moveBtn.dataset.id;
         render();
         return;
@@ -597,6 +597,7 @@ function bindGrid(supervisor, gridType) {
       const editBtn = e.target.closest('[data-action="edit"]');
       if (editBtn) {
         e.stopPropagation();
+        document.querySelector('.info-modal-overlay')?.remove();
         const id = editBtn.dataset.id;
         const mgr = state.placements.find(p => p.id === id);
         if (!mgr) return;
@@ -613,6 +614,7 @@ function bindGrid(supervisor, gridType) {
       const deleteBtn = e.target.closest('[data-action="delete"]');
       if (deleteBtn) {
         e.stopPropagation();
+        document.querySelector('.info-modal-overlay')?.remove();
         const id = deleteBtn.dataset.id;
         state.placements = state.placements.filter(p => p.id !== id);
         db.remove(id);
@@ -620,21 +622,44 @@ function bindGrid(supervisor, gridType) {
         return;
       }
 
-      // Click on dot itself — toggle action popup
+      // Click on dot itself — show info modal
       const dot = e.target.closest('.manager-dot');
       if (!dot) return;
       e.stopPropagation();
       if (state.pending || state.moving) return;
 
-      const popup = dot.querySelector('.dot-actions-popup');
-      const isVisible = popup.style.display === 'flex';
+      const id = dot.dataset.id;
+      const mgr = state.placements.find(p => p.id === id);
+      if (!mgr) return;
+      const role = roleFromGridType(mgr.gridType);
 
-      // Hide all popups first
-      dotLayer.querySelectorAll('.dot-actions-popup').forEach(p => p.style.display = 'none');
+      // Remove any existing info modal
+      document.querySelector('.info-modal-overlay')?.remove();
 
-      if (!isVisible) {
-        popup.style.display = 'flex';
-      }
+      const modal = document.createElement('div');
+      modal.className = 'info-modal-overlay';
+      modal.innerHTML = `
+        <div class="info-modal">
+          <div class="info-modal-header">
+            <span class="role-badge" style="background:${roleBadgeColor(role)}">${role}</span>
+            <h3>${mgr.fullName}</h3>
+          </div>
+          <div class="info-modal-body">
+            <div class="info-row"><span class="info-label">Store #</span><span>${mgr.storeNumber}</span></div>
+            <div class="info-row"><span class="info-label">Role</span><span>${mgr.gridType}</span></div>
+            <div class="info-row"><span class="info-label">Supervisor</span><span>${mgr.supervisorName}</span></div>
+          </div>
+          <div class="info-modal-actions">
+            <button class="dot-btn dot-btn-move" data-action="move" data-id="${id}">Move</button>
+            <button class="dot-btn dot-btn-edit" data-action="edit" data-id="${id}">Edit</button>
+            <button class="dot-btn dot-btn-delete" data-action="delete" data-id="${id}">Delete</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+
+      modal.addEventListener('click', (ev) => {
+        if (ev.target === modal) modal.remove();
+      });
     });
 
     document.addEventListener('click', (e) => {

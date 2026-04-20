@@ -457,6 +457,55 @@ body {
 }
 .btn-save:hover { background: #3730a3; }
 
+/* ── Info Modal ── */
+.info-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.info-modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px;
+  width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+.info-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.info-modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+}
+.info-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.info-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+.info-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 /* ── Mobile ── */
 @media (max-width: 600px) {
   #app {
