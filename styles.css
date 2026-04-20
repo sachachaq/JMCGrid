@@ -334,6 +334,9 @@ body {
 }
 .manager-dot:hover .dot-tooltip,
 .manager-dot.show-tooltip .dot-tooltip { display: block; }
+.manager-dot:hover {
+  z-index: 50;
+}
 
 .dot-actions-popup {
   position: absolute;
