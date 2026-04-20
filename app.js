@@ -371,12 +371,16 @@ function renderJmcRoster(filter) {
       bySupervisor[m.supervisorName].push(m);
     });
 
+    const roleOrder = ['GM', 'AM', 'SM'];
     for (const [sup, list] of Object.entries(bySupervisor)) {
+      const sorted = [...list].sort((a, b) => {
+        return roleOrder.indexOf(roleFromGridType(a.gridType)) - roleOrder.indexOf(roleFromGridType(b.gridType));
+      });
       content += `
         <div class="roster-group">
-          <div class="roster-group-title">${sup} <span style="color:#9ca3af;font-weight:400">(${list.length})</span></div>
+          <div class="roster-group-title">${sup} <span style="color:#9ca3af;font-weight:400">(${sorted.length})</span></div>
           <div class="roster-list">
-            ${list.map(m => {
+            ${sorted.map(m => {
               const role = roleFromGridType(m.gridType);
               return `
               <div class="roster-item">
