@@ -93,7 +93,7 @@ const state = {
     'Alexa':  ['3320','3425','3426','3427','3420'],
     'Rana':   ['3463','3687','3689','3685','3692','3688'],
     'Marie':  ['3555'],
-    'Eleterio': []
+    'Eleterio': ['3327','3331','3507','3510']
   },
   placements: [],      // { id, supervisorName, gridType, fullName, storeNumber, xPercent, yPercent }
   pending: null,        // { fullName, storeNumber } awaiting click-to-place
