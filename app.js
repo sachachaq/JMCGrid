@@ -111,9 +111,9 @@ function roleFromGridType(gridType) {
 
 function roleBadgeColor(role) {
   switch (role) {
-    case 'GM': return '#4338ca';
-    case 'AM': return '#0891b2';
-    case 'SM': return '#059669';
+    case 'GM': return '#3b0764';
+    case 'AM': return '#6b21a8';
+    case 'SM': return '#a855f7';
     default:   return '#6b7280';
   }
 }
