@@ -238,7 +238,7 @@ body {
   grid-template-rows: repeat(3, 1fr);
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   aspect-ratio: 1;
   max-width: 600px;
   position: relative;
